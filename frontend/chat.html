@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChatApp - Messenger</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .app-container {
+            display: flex;
+            height: 100vh;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: 300px;
+            background: #f5f5f5;
+            border-right: 1px solid #e0e0e0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .user-info {
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .user-details h3 {
+            font-size: 16px;
+            margin-bottom: 4px;
+        }
+
+        .user-details p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .online-status {
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #4caf50;
+            display: inline-block;
+            margin-left: 8px;
+        }
+
+        .search-box {
+            padding: 15px;
+            background: white;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .users-list {
+            flex: 1;
+            overflow-y: auto;
+        }
+
+        .user-item {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        .user-item:hover {
+            background: #e8e8e8;
+        }
+
+        .user-item.active {
+            background: #e3e6ff;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #764ba2;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+
+        .user-info-text {
+            flex: 1;
+        }
+
+        .user-info-text h4 {
+            font-size: 14px;
+            margin-bottom: 4px;
+        }
+
+        .user-info-text p {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #ccc;
+            display: inline-block;
+            margin-right: 6px;
+        }
+
+        .online-dot.online {
+            background: #4caf50;
+        }
+
+        /* Chat Area */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: #fff;
+        }
+
+        .chat-header {
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .chat-actions button {
+            padding: 8px 12px;
+            margin-left: 8px;
+            border: none;
+            background: #f0f0f0;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .messages-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            background: #f9f9f9;
+        }
+
+        .message {
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .message.sent {
+            align-items: flex-end;
+        }
+
+        .message.received {
+            align-items: flex-start;
+        }
+
+        .message-bubble {
+            max-width: 60%;
+            padding: 10px 15px;
+            border-radius: 18px;
+            position: relative;
+        }
+
+        .message.sent .message-bubble {
+            background: #667eea;
+            color: white;
+        }
+
+        .message.received .message-bubble {
+            background: white;
+            color: #333;
+            border: 1px solid #e0e0e0;
+        }
+
+        .message-time {
+            font-size: 10px;
+            margin-top: 4px;
+            color: #999;
+        }
+
+        .typing-indicator {
+            padding: 10px 20px;
+            font-size: 12px;
+            color: #666;
+            font-style: italic;
+        }
+
+        .message-input-area {
+            padding: 20px;
+            background: white;
+            border-top: 1px solid #e0e0e0;
+            display: flex;
+            gap: 10px;
+        }
+
+        .message-input-area input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 24px;
+            font-size: 14px;
+        }
+
+        .message-input-area button {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 24px;
+            cursor: pointer;
+        }
+
+        .emoji-picker {
+            position: relative;
+        }
+
+        .emoji-btn {
+            padding: 10px;
+            background: #f0f0f0;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar -->
+        <div class="sidebar">
+            <div class="user-info" id="user-info">
+                <div class="avatar" id="user-avatar"></div>
+                <div class="user-details">
+                    <h3 id="username-display">Loading...</h3>
+                    <p>Online <span class="online-status"></span></p>
+                </div>
+            </div>
+            
+            <div class="search-box">
+                <input type="text" placeholder="Search users..." id="search-users">
+            </div>
+            
+            <div class="users-list" id="users-list">
+                <!-- Users will be loaded here -->
+                <div style="padding: 20px; text-align: center; color: #999;">Loading users...</div>
+            </div>
+        </div>
+
+        <!-- Chat Area -->
+        <div class="chat-area" id="chat-area" style="display: none;">
+            <div class="chat-header">
+                <div class="chat-user-info">
+                    <div class="avatar" id="chat-avatar"></div>
+                    <div>
+                        <h3 id="chat-username">Select a user</h3>
+                        <p id="chat-status">Offline</p>
+                    </div>
+                </div>
+                <div class="chat-actions">
+                    <button onclick="startCall('voice')">📞 Voice</button>
+                    <button onclick="startCall('video')">📹 Video</button>
+                </div>
+            </div>
+
+            <div class="messages-container" id="messages-container">
+                <!-- Messages will be loaded here -->
+            </div>
+
+            <div class="typing-indicator" id="typing-indicator" style="display: none;">
+                Typing...
+            </div>
+
+            <div class="message-input-area">
+                <div class="emoji-picker">
+                    <button class="emoji-btn" onclick="toggleEmojiPicker()">😊</button>
+                </div>
+                <input type="text" id="message-input" placeholder="Type a message..." onkeypress="handleKeyPress(event)">
+                <button onclick="sendMessage()">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let ws = null;
+        let currentUser = null;
+        let currentChatUser = null;
+        let token = null;
+        let typingTimeout = null;
+
+        // Load user from localStorage
+        const userStr = localStorage.getItem('user');
+        token = localStorage.getItem('token');
+
+        if (!userStr || !token) {
+            window.location.href = '/';
+        }
+
+        currentUser = JSON.parse(userStr);
+        document.getElementById('username-display').innerText = currentUser.username;
+        document.getElementById('user-avatar').innerText = currentUser.username[0].toUpperCase();
+
+        // Connect WebSocket
+        function connectWebSocket() {
+            const wsUrl = `${window.location.protocol === 'https:' ? 'wss:' : 'ws:'}//${window.location.host}/ws?token=${token}`;
+            ws = new WebSocket(wsUrl);
+
+            ws.onopen = () => {
+                console.log('WebSocket connected');
+                loadUsers();
+            };
+
+            ws.onmessage = (event) => {
+                const data = JSON.parse(event.data);
+                handleWebSocketMessage(data);
+            };
+
+            ws.onerror = (error) => {
+                console.error('WebSocket error:', error);
+            };
+
+            ws.onclose = () => {
+                console.log('WebSocket disconnected, reconnecting in 3 seconds...');
+                setTimeout(connectWebSocket, 3000);
+            };
+        }
+
+        function handleWebSocketMessage(data) {
+            switch(data.type) {
+                case 'message':
+                    if (data.sender_id === currentChatUser?.id || data.receiver_id === currentChatUser?.id) {
+                        displayMessage(data);
+                    }
+                    break;
+                case 'typing':
+                    if (data.from === currentChatUser?.id) {
+                        showTypingIndicator();
+                    }
+                    break;
+                case 'user_online':
+                    updateUserStatus(data.user_id, true);
+                    break;
+                case 'user_offline':
+                    updateUserStatus(data.user_id, false);
+                    break;
+                case 'users':
+                    loadUsersList(data.data);
+                    break;
+            }
+        }
+
+        async function loadUsers() {
+            try {
+                const response = await fetch(`/api/users?user_id=${currentUser.id}`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const users = await response.json();
+                loadUsersList(users);
+            } catch (error) {
+                console.error('Error loading users:', error);
+            }
+        }
+
+        function loadUsersList(users) {
+            const usersList = document.getElementById('users-list');
+            if (!users.length) {
+                usersList.innerHTML = '<div style="padding: 20px; text-align: center; color: #999;">No users found</div>';
+                return;
+            }
+
+            usersList.innerHTML = users.map(user => `
+                <div class="user-item" onclick="selectUser(${user.id}, '${user.username}')">
+                    <div class="user-avatar">${user.username[0].toUpperCase()}</div>
+                    <div class="user-info-text">
+                        <h4>${user.username}</h4>
+                        <p>
+                            <span class="online-dot ${user.is_online ? 'online' : ''}"></span>
+                            ${user.is_online ? 'Online' : 'Offline'}
+                        </p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function selectUser(userId, username) {
+            currentChatUser = { id: userId, username: username };
+            
+            document.getElementById('chat-area').style.display = 'flex';
+            document.getElementById('chat-username').innerText = username;
+            document.getElementById('chat-avatar').innerText = username[0].toUpperCase();
+            
+            // Load chat history
+            await loadChatHistory(userId);
+        }
+
+        async function loadChatHistory(userId) {
+            try {
+                const response = await fetch(`/api/messages/${currentUser.id}/${userId}?limit=50`, {
+                    headers: { 'Authorization': `Bearer ${token}` }
+                });
+                const messages = await response.json();
+                
+                const container = document.getElementById('messages-container');
+                container.innerHTML = '';
+                
+                messages.reverse().forEach(msg => {
+                    displayMessage(msg, false);
+                });
+                
+                scrollToBottom();
+            } catch (error) {
+                console.error('Error loading chat history:', error);
+            }
+        }
+
+        function displayMessage(message, saveToChat = true) {
+            const container = document.getElementById('messages-container');
+            const isSent = message.sender_id === currentUser.id;
+            
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${isSent ? 'sent' : 'received'}`;
+            messageDiv.innerHTML = `
+                <div class="message-bubble">
+                    ${escapeHtml(message.message)}
+                </div>
+                <div class="message-time">${message.time || new Date(message.created_at).toLocaleTimeString()}</div>
+            `;
+            
+            container.appendChild(messageDiv);
+            scrollToBottom();
+        }
+
+        function sendMessage() {
+            const input = document.getElementById('message-input');
+            const text = input.value.trim();
+            
+            if (!text || !currentChatUser) return;
+            
+            const messageData = {
+                type: 'dm',
+                to: currentChatUser.username,
+                msg: text
+            };
+            
+            ws.send(JSON.stringify(messageData));
+            input.value = '';
+        }
+
+        function handleKeyPress(event) {
+            if (event.key === 'Enter') {
+                sendMessage();
+            } else {
+                // Send typing indicator
+                if (currentChatUser) {
+                    ws.send(JSON.stringify({
+                        type: 'typing',
+                        to: currentChatUser.username,
+                        is_typing: true
+                    }));
+                    
+                    clearTimeout(typingTimeout);
+                    typingTimeout = setTimeout(() => {
+                        ws.send(JSON.stringify({
+                            type: 'typing',
+                            to: currentChatUser.username,
+                            is_typing: false
+                        }));
+                    }, 1000);
+                }
+            }
+        }
+
+        function showTypingIndicator() {
+            const indicator = document.getElementById('typing-indicator');
+            indicator.style.display = 'block';
+            setTimeout(() => {
+                indicator.style.display = 'none';
+            }, 2000);
+        }
+
+        function scrollToBottom() {
+            const container = document.getElementById('messages-container');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function updateUserStatus(userId, isOnline) {
+            // Update status in users list
+            const userItems = document.querySelectorAll('.user-item');
+            userItems.forEach(item => {
+                if (item.onclick.toString().includes(userId)) {
+                    const statusDot = item.querySelector('.online-dot');
+                    if (statusDot) {
+                        statusDot.className = `online-dot ${isOnline ? 'online' : ''}`;
+                    }
+                }
+            });
+            
+            // Update current chat header
+            if (currentChatUser && currentChatUser.id === userId) {
+                document.getElementById('chat-status').innerText = isOnline ? 'Online' : 'Offline';
+            }
+        }
+
+        function startCall(type) {
+            if (!currentChatUser) return;
+            alert(`${type} call feature coming soon!`);
+        }
+
+        function toggleEmojiPicker() {
+            alert('Emoji picker coming soon!');
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Search functionality
+        document.getElementById('search-users').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const userItems = document.querySelectorAll('.user-item');
+            userItems.forEach(item => {
+                const username = item.querySelector('h4').innerText.toLowerCase();
+                if (username.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        });
+
+        // Initialize
+        connectWebSocket();
+    </script>
+</body>
+</html>
