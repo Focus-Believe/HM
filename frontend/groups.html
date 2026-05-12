@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Groups - ChatApp</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .groups-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .create-group {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .create-group input, .create-group textarea {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .group-list {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .group-item {
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            cursor: pointer;
+        }
+        .group-item:hover {
+            background: #f9f9f9;
+        }
+        .group-avatar {
+            width: 50px;
+            height: 50px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 20px;
+        }
+        .group-info {
+            flex: 1;
+        }
+        .group-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .group-members {
+            font-size: 12px;
+            color: #666;
+        }
+    </style>
+</head>
+<body>
+    <div class="groups-container">
+        <h1>Groups</h1>
+        
+        <div class="create-group">
+            <h3>Create New Group</h3>
+            <input type="text" id="group-name" placeholder="Group Name">
+            <textarea id="group-desc" placeholder="Group Description"></textarea>
+            <input type="text" id="group-members" placeholder="Members (comma separated usernames)">
+            <button onclick="createGroup()">Create Group</button>
+        </div>
+        
+        <div class="group-list" id="group-list">
+            <div style="padding: 20px; text-align: center; color: #999;">Loading groups...</div>
+        </div>
+    </div>
+    
+    <script>
+        async function createGroup() {
+            const name = document.getElementById('group-name').value;
+            const description = document.getElementById('group-desc').value;
+            const members = document.getElementById('group-members').value.split(',').map(m => m.trim());
+            
+            const response = await fetch('/api/groups', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ name, description, members })
+            });
+            
+            if (response.ok) {
+                alert('Group created!');
+                loadGroups();
+            }
+        }
+        
+        async function loadGroups() {
+            const response = await fetch('/api/groups');
+            const groups = await response.json();
+            
+            const container = document.getElementById('group-list');
+            container.innerHTML = groups.map(group => `
+                <div class="group-item" onclick="window.location.href='/chat?group=${group.id}'">
+                    <div class="group-avatar">${group.name[0]}</div>
+                    <div class="group-info">
+                        <div class="group-name">${group.name}</div>
+                        <div class="group-members">${group.member_count || 0} members</div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        loadGroups();
+    </script>
+</body>
+</html>
