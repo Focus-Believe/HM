@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Calls - ChatApp</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #1a1a2e;
+            margin: 0;
+            padding: 20px;
+            color: white;
+        }
+        .call-container {
+            max-width: 800px;
+            margin: 0 auto;
+            text-align: center;
+        }
+        .video-container {
+            background: #16213e;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        video {
+            width: 100%;
+            max-width: 600px;
+            background: #0f3460;
+            border-radius: 10px;
+        }
+        .call-controls {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .call-btn {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: none;
+            font-size: 24px;
+            cursor: pointer;
+        }
+        .call-btn.voice { background: #28a745; }
+        .call-btn.video { background: #007bff; }
+        .call-btn.end { background: #dc3545; }
+        .call-btn.mute { background: #ffc107; }
+    </style>
+</head>
+<body>
+    <div class="call-container">
+        <h1>Voice & Video Calls</h1>
+        
+        <div class="video-container" id="video-container" style="display: none;">
+            <video id="local-video" autoplay muted></video>
+            <video id="remote-video" autoplay></video>
+        </div>
+        
+        <div class="call-controls">
+            <button class="call-btn voice" onclick="startCall('voice')">📞</button>
+            <button class="call-btn video" onclick="startCall('video')">📹</button>
+        </div>
+        
+        <div id="call-status" style="margin-top: 20px;"></div>
+    </div>
+    
+    <script>
+        let localStream = null;
+        let peerConnection = null;
+        
+        async function startCall(type) {
+            try {
+                localStream = await navigator.mediaDevices.getUserMedia({
+                    audio: true,
+                    video: type === 'video'
+                });
+                
+                document.getElementById('local-video').srcObject = localStream;
+                document.getElementById('video-container').style.display = 'block';
+                
+                // Initialize WebRTC connection
+                peerConnection = new RTCPeerConnection();
+                
+                localStream.getTracks().forEach(track => {
+                    peerConnection.addTrack(track, localStream);
+                });
+                
+                peerConnection.ontrack = (event) => {
+                    document.getElementById('remote-video').srcObject = event.streams[0];
+                };
+                
+                document.getElementById('call-status').innerText = `Call in progress...`;
+            } catch (error) {
+                console.error('Call failed:', error);
+                alert('Cannot start call. Please check camera/microphone permissions.');
+            }
+        }
+        
+        function endCall() {
+            if (localStream) {
+                localStream.getTracks().forEach(track => track.stop());
+            }
+            if (peerConnection) {
+                peerConnection.close();
+            }
+            document.getElementById('video-container').style.display = 'none';
+            document.getElementById('call-status').innerText = '';
+        }
+    </script>
+</body>
+</html>
