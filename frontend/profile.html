@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Profile - ChatApp</title>
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .profile-container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            padding: 30px;
+        }
+        .avatar {
+            width: 100px;
+            height: 100px;
+            background: #667eea;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 40px;
+            margin: 0 auto 20px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #666;
+        }
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        button {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="profile-container">
+        <div class="avatar" id="avatar">U</div>
+        <h2 style="text-align: center;">My Profile</h2>
+        
+        <div class="form-group">
+            <label>Username</label>
+            <input type="text" id="username" readonly>
+        </div>
+        <div class="form-group">
+            <label>Email</label>
+            <input type="email" id="email">
+        </div>
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="fullname">
+        </div>
+        <div class="form-group">
+            <label>Bio</label>
+            <input type="text" id="bio" placeholder="Tell something about yourself">
+        </div>
+        
+        <button onclick="updateProfile()">Update Profile</button>
+        <button onclick="enable2FA()" style="margin-left: 10px; background: #28a745;">Enable 2FA</button>
+        <button onclick="logout()" style="margin-left: 10px; background: #dc3545;">Logout</button>
+    </div>
+    
+    <script>
+        const user = JSON.parse(localStorage.getItem('user') || '{}');
+        document.getElementById('avatar').innerText = user.username?.[0]?.toUpperCase() || 'U';
+        document.getElementById('username').value = user.username || '';
+        document.getElementById('email').value = user.email || '';
+        document.getElementById('fullname').value = user.full_name || '';
+        
+        async function updateProfile() {
+            const response = await fetch('/api/users/profile', {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    email: document.getElementById('email').value,
+                    full_name: document.getElementById('fullname').value,
+                    bio: document.getElementById('bio').value
+                })
+            });
+            
+            if (response.ok) {
+                alert('Profile updated!');
+            }
+        }
+        
+        async function enable2FA() {
+            const response = await fetch('/api/auth/2fa/enable', { method: 'POST' });
+            const data = await response.json();
+            alert(`Scan this QR code with Google Authenticator: ${data.qr_code}`);
+        }
+        
+        function logout() {
+            localStorage.clear();
+            window.location.href = '/';
+        }
+    </script>
+</body>
+</html>
