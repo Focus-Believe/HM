@@ -1,0 +1,613 @@
+/* Dark Theme Styles for ChatApp */
+/* Apply this class to body tag: <body class="dark-theme"> */
+
+.dark-theme {
+    --dark-bg-primary: #1a1a2e;
+    --dark-bg-secondary: #16213e;
+    --dark-bg-tertiary: #0f3460;
+    --dark-text-primary: #ffffff;
+    --dark-text-secondary: #a0a0a0;
+    --dark-border: #2a2a4a;
+    --dark-hover: #1f1f3a;
+    --dark-accent: #667eea;
+    --dark-accent-hover: #5a67d8;
+    --dark-success: #4caf50;
+    --dark-danger: #f44336;
+    --dark-warning: #ff9800;
+    --dark-info: #2196f3;
+}
+
+/* Body & Background */
+.dark-theme body {
+    background: var(--dark-bg-primary);
+    color: var(--dark-text-primary);
+}
+
+/* Sidebar */
+.dark-theme .sidebar {
+    background: var(--dark-bg-secondary);
+    border-right-color: var(--dark-border);
+}
+
+.dark-theme .user-info {
+    background: var(--dark-bg-tertiary);
+    border-bottom-color: var(--dark-border);
+}
+
+.dark-theme .user-details h3 {
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .user-details p {
+    color: var(--dark-text-secondary);
+}
+
+/* User List */
+.dark-theme .user-item {
+    border-bottom-color: var(--dark-border);
+}
+
+.dark-theme .user-item:hover {
+    background: var(--dark-hover);
+}
+
+.dark-theme .user-item.active {
+    background: var(--dark-bg-tertiary);
+}
+
+.dark-theme .user-info-text h4 {
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .user-info-text p {
+    color: var(--dark-text-secondary);
+}
+
+/* Search Box */
+.dark-theme .search-box {
+    background: var(--dark-bg-secondary);
+}
+
+.dark-theme .search-box input {
+    background: var(--dark-bg-tertiary);
+    border-color: var(--dark-border);
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .search-box input::placeholder {
+    color: var(--dark-text-secondary);
+}
+
+.dark-theme .search-box input:focus {
+    border-color: var(--dark-accent);
+    outline: none;
+}
+
+/* Chat Area */
+.dark-theme .chat-area {
+    background: var(--dark-bg-primary);
+}
+
+.dark-theme .chat-header {
+    background: var(--dark-bg-secondary);
+    border-bottom-color: var(--dark-border);
+}
+
+.dark-theme .chat-header h3 {
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .chat-header p {
+    color: var(--dark-text-secondary);
+}
+
+/* Messages Container */
+.dark-theme .messages-container {
+    background: var(--dark-bg-primary);
+}
+
+/* Message Bubbles */
+.dark-theme .message.sent .message-bubble {
+    background: var(--dark-accent);
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .message.received .message-bubble {
+    background: var(--dark-bg-secondary);
+    color: var(--dark-text-primary);
+    border-color: var(--dark-border);
+}
+
+.dark-theme .message-time {
+    color: var(--dark-text-secondary);
+}
+
+/* Message Input Area */
+.dark-theme .message-input-area {
+    background: var(--dark-bg-secondary);
+    border-top-color: var(--dark-border);
+}
+
+.dark-theme .message-input-area input {
+    background: var(--dark-bg-tertiary);
+    border-color: var(--dark-border);
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .message-input-area input::placeholder {
+    color: var(--dark-text-secondary);
+}
+
+.dark-theme .message-input-area input:focus {
+    border-color: var(--dark-accent);
+    outline: none;
+}
+
+.dark-theme .message-input-area button {
+    background: var(--dark-accent);
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .message-input-area button:hover {
+    background: var(--dark-accent-hover);
+}
+
+/* Typing Indicator */
+.dark-theme .typing-indicator {
+    background: var(--dark-bg-primary);
+    color: var(--dark-text-secondary);
+}
+
+/* Buttons */
+.dark-theme button {
+    background: var(--dark-accent);
+    color: var(--dark-text-primary);
+    border: none;
+}
+
+.dark-theme button:hover {
+    background: var(--dark-accent-hover);
+}
+
+.dark-theme .chat-actions button {
+    background: var(--dark-bg-tertiary);
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .chat-actions button:hover {
+    background: var(--dark-accent);
+}
+
+/* Login/Register Page */
+.dark-theme .container {
+    background: var(--dark-bg-secondary);
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+}
+
+.dark-theme .logo h1 {
+    color: var(--dark-accent);
+}
+
+.dark-theme .logo p {
+    color: var(--dark-text-secondary);
+}
+
+.dark-theme .tab-btn {
+    background: var(--dark-bg-tertiary);
+    color: var(--dark-text-secondary);
+}
+
+.dark-theme .tab-btn.active {
+    background: var(--dark-accent);
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .form-group label {
+    color: var(--dark-text-secondary);
+}
+
+.dark-theme .form-group input {
+    background: var(--dark-bg-tertiary);
+    border-color: var(--dark-border);
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .form-group input:focus {
+    border-color: var(--dark-accent);
+    outline: none;
+}
+
+/* Dashboard Cards */
+.dark-theme .stat-card {
+    background: var(--dark-bg-secondary);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.dark-theme .stat-number {
+    color: var(--dark-accent);
+}
+
+.dark-theme .stat-label {
+    color: var(--dark-text-secondary);
+}
+
+/* Groups Page */
+.dark-theme .create-group {
+    background: var(--dark-bg-secondary);
+}
+
+.dark-theme .create-group input,
+.dark-theme .create-group textarea {
+    background: var(--dark-bg-tertiary);
+    border-color: var(--dark-border);
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .group-list {
+    background: var(--dark-bg-secondary);
+}
+
+.dark-theme .group-item {
+    border-bottom-color: var(--dark-border);
+}
+
+.dark-theme .group-item:hover {
+    background: var(--dark-hover);
+}
+
+.dark-theme .group-name {
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .group-members {
+    color: var(--dark-text-secondary);
+}
+
+/* Profile Page */
+.dark-theme .profile-container {
+    background: var(--dark-bg-secondary);
+}
+
+.dark-theme .avatar {
+    background: var(--dark-accent);
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .form-group label {
+    color: var(--dark-text-secondary);
+}
+
+.dark-theme .form-group input {
+    background: var(--dark-bg-tertiary);
+    border-color: var(--dark-border);
+    color: var(--dark-text-primary);
+}
+
+/* Calls Page */
+.dark-theme .video-container {
+    background: var(--dark-bg-tertiary);
+}
+
+.dark-theme .call-btn.voice {
+    background: #28a745;
+}
+
+.dark-theme .call-btn.video {
+    background: #007bff;
+}
+
+.dark-theme .call-btn.end {
+    background: #dc3545;
+}
+
+.dark-theme .call-btn.mute {
+    background: #ffc107;
+    color: #333;
+}
+
+/* Scrollbar for Dark Theme */
+.dark-theme ::-webkit-scrollbar-track {
+    background: var(--dark-bg-tertiary);
+}
+
+.dark-theme ::-webkit-scrollbar-thumb {
+    background: var(--dark-accent);
+}
+
+.dark-theme ::-webkit-scrollbar-thumb:hover {
+    background: var(--dark-accent-hover);
+}
+
+/* Notifications & Toast */
+.dark-theme .toast {
+    background: var(--dark-bg-secondary);
+    color: var(--dark-text-primary);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+}
+
+.dark-theme .toast.success {
+    background: var(--dark-success);
+}
+
+.dark-theme .toast.error {
+    background: var(--dark-danger);
+}
+
+.dark-theme .toast.warning {
+    background: var(--dark-warning);
+    color: #333;
+}
+
+.dark-theme .toast.info {
+    background: var(--dark-info);
+}
+
+/* Loading Spinner */
+.dark-theme .spinner {
+    border-color: var(--dark-bg-tertiary);
+    border-top-color: var(--dark-accent);
+}
+
+/* Dropdown Menus */
+.dark-theme .dropdown-menu {
+    background: var(--dark-bg-secondary);
+    border-color: var(--dark-border);
+}
+
+.dark-theme .dropdown-item {
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .dropdown-item:hover {
+    background: var(--dark-hover);
+}
+
+/* Modal/Popup */
+.dark-theme .modal-content {
+    background: var(--dark-bg-secondary);
+    border-color: var(--dark-border);
+}
+
+.dark-theme .modal-header {
+    border-bottom-color: var(--dark-border);
+}
+
+.dark-theme .modal-footer {
+    border-top-color: var(--dark-border);
+}
+
+.dark-theme .close {
+    color: var(--dark-text-primary);
+}
+
+/* Status Indicators */
+.dark-theme .online-dot.online {
+    background: var(--dark-success);
+}
+
+.dark-theme .online-dot.offline {
+    background: var(--dark-text-secondary);
+}
+
+/* Links */
+.dark-theme a {
+    color: var(--dark-accent);
+}
+
+.dark-theme a:hover {
+    color: var(--dark-accent-hover);
+}
+
+/* Code Blocks */
+.dark-theme pre,
+.dark-theme code {
+    background: var(--dark-bg-tertiary);
+    color: var(--dark-text-primary);
+    border-color: var(--dark-border);
+}
+
+/* Tables */
+.dark-theme table {
+    border-color: var(--dark-border);
+}
+
+.dark-theme th,
+.dark-theme td {
+    border-color: var(--dark-border);
+}
+
+.dark-theme tr:hover {
+    background: var(--dark-hover);
+}
+
+/* Theme Toggle Button */
+.theme-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    background: var(--dark-accent);
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+}
+
+.theme-toggle:hover {
+    transform: scale(1.1);
+}
+
+.dark-theme .theme-toggle {
+    background: var(--dark-accent);
+    color: white;
+}
+
+/* Responsive Dark Theme */
+@media (max-width: 768px) {
+    .dark-theme .sidebar {
+        background: var(--dark-bg-secondary);
+    }
+}
+
+/* Animations for Dark Theme */
+.dark-theme .fade-in {
+    animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Active/Current Chat Highlight */
+.dark-theme .user-item.active {
+    background: var(--dark-bg-tertiary);
+    border-left: 3px solid var(--dark-accent);
+}
+
+/* Message Search Highlight */
+.dark-theme .search-highlight {
+    background: var(--dark-warning);
+    color: #333;
+    padding: 0 2px;
+    border-radius: 3px;
+}
+
+/* File Upload Area */
+.dark-theme .file-upload-area {
+    background: var(--dark-bg-tertiary);
+    border: 2px dashed var(--dark-border);
+}
+
+.dark-theme .file-upload-area:hover {
+    border-color: var(--dark-accent);
+}
+
+/* Voice Recording */
+.dark-theme .voice-recording {
+    background: var(--dark-danger);
+    animation: pulse 1s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 1; }
+    50% { opacity: 0.6; }
+    100% { opacity: 1; }
+}
+
+/* Image Preview */
+.dark-theme .image-preview {
+    background: var(--dark-bg-tertiary);
+    border-color: var(--dark-border);
+}
+
+/* Call Status */
+.dark-theme .call-status {
+    background: var(--dark-bg-tertiary);
+    color: var(--dark-text-primary);
+}
+
+.dark-theme .call-status.incoming {
+    background: var(--dark-info);
+}
+
+.dark-theme .call-status.active {
+    background: var(--dark-success);
+}
+
+.dark-theme .call-status.ended {
+    background: var(--dark-danger);
+}
+
+/* Group Info */
+.dark-theme .group-info-panel {
+    background: var(--dark-bg-secondary);
+    border-color: var(--dark-border);
+}
+
+.dark-theme .group-member-list {
+    background: var(--dark-bg-tertiary);
+}
+
+/* Reaction Picker */
+.dark-theme .reaction-picker {
+    background: var(--dark-bg-secondary);
+    border-color: var(--dark-border);
+}
+
+.dark-theme .reaction-emoji {
+    background: transparent;
+}
+
+.dark-theme .reaction-emoji:hover {
+    background: var(--dark-hover);
+}
+
+/* Read Receipt */
+.dark-theme .read-receipt {
+    color: var(--dark-accent);
+}
+
+.dark-theme .delivered-receipt {
+    color: var(--dark-text-secondary);
+}
+
+/* Forward Message Preview */
+.dark-theme .forward-preview {
+    background: var(--dark-bg-tertiary);
+    border-left-color: var(--dark-accent);
+}
+
+/* Poll/Survey */
+.dark-theme .poll-container {
+    background: var(--dark-bg-secondary);
+}
+
+.dark-theme .poll-option {
+    background: var(--dark-bg-tertiary);
+}
+
+.dark-theme .poll-option:hover {
+    background: var(--dark-hover);
+}
+
+.dark-theme .poll-progress-bar {
+    background: var(--dark-accent);
+}
+
+/* Story/Status */
+.dark-theme .story-container {
+    background: var(--dark-bg-primary);
+}
+
+.dark-theme .story-viewer {
+    background: var(--dark-bg-secondary);
+}
+
+/* Emoji Picker */
+.dark-theme .emoji-picker-container {
+    background: var(--dark-bg-secondary);
+    border-color: var(--dark-border);
+}
+
+.dark-theme .emoji-category {
+    border-bottom-color: var(--dark-border);
+}
+
+.dark-theme .emoji-item:hover {
+    background: var(--dark-hover);
+}
