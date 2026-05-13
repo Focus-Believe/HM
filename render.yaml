@@ -1,182 +1,70 @@
 services:
-
-  # ==================================
-  # MAIN FASTAPI SERVER
-  # ==================================
   - type: web
-    name: hey-min-web
+    name: hey-min
     runtime: python
-    repo: https://github.com/YOUR_USERNAME/hey-min
-    branch: main
-    plan: free
-
-    buildCommand: |
-      pip install -r requirements.txt
-
-    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
-
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port 8000
     envVars:
-
       - key: DATABASE_URL
         fromDatabase:
           name: hey-min-db
           property: connectionString
-
       - key: REDIS_URL
         fromService:
           type: redis
           name: hey-min-redis
           property: connectionString
-
       - key: SECRET_KEY
         generateValue: true
-
       - key: JWT_SECRET
         generateValue: true
-
       - key: WEBHOOK_SECRET
         generateValue: true
-
-      - key: APP_ENV
-        value: production
-
       - key: APP_NAME
         value: "Hey MIN"
-
-      - key: DEBUG
-        value: "false"
-
-      - key: CORS_ORIGINS
-        value: "*"
-
-      - key: MAX_FILE_SIZE
-        value: "10485760"
-
-      - key: RATE_LIMIT_MESSAGES
-        value: "30"
-
-      - key: RATE_LIMIT_WINDOW
-        value: "60"
-
-      - key: ENABLE_2FA
-        value: "false"
-
-      - key: ENABLE_VOICE_CALLS
-        value: "false"
-
-      - key: ENABLE_VIDEO_CALLS
-        value: "false"
-
-      - key: ENABLE_AI_ASSISTANT
-        value: "false"
-
-      - key: ENABLE_FILE_SHARING
-        value: "true"
-
-      - key: ENABLE_GROUP_CHAT
-        value: "true"
-
-      - key: ENABLE_STORIES
-        value: "false"
-
-      - key: ENABLE_POLLS
-        value: "true"
-
-
-
-  # ==================================
-  # CELERY WORKER
-  # ==================================
-  - type: worker
-    name: hey-min-worker
-    runtime: python
-    plan: free
-
-    buildCommand: |
-      pip install -r requirements.txt
-
-    startCommand: celery -A backend.tasks worker --loglevel=info
-
-    envVars:
-
-      - key: DATABASE_URL
-        fromDatabase:
-          name: hey-min-db
-          property: connectionString
-
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: hey-min-redis
-          property: connectionString
-
       - key: APP_ENV
         value: production
+      - key: ENABLE_2FA
+        value: "true"
+      - key: ENABLE_VOICE_CALLS
+        value: "true"
+      - key: ENABLE_VIDEO_CALLS
+        value: "true"
+      - key: ENABLE_GROUP_CHAT
+        value: "true"
+      - key: ENABLE_MESSAGE_REACTIONS
+        value: "true"
+      - key: ENABLE_MESSAGE_EDIT
+        value: "true"
+      - key: ENABLE_TYPING_INDICATOR
+        value: "true"
+      - key: ENABLE_READ_RECEIPTS
+        value: "true"
+      - key: ENABLE_FILE_SHARING
+        value: "true"
+      - key: ENABLE_STORIES
+        value: "true"
+      - key: ENABLE_AI_ASSISTANT
+        value: "true"
+      - key: ENABLE_BLOCK_USERS
+        value: "true"
+      - key: ENABLE_DARK_MODE
+        value: "true"
+      - key: MAX_FILE_SIZE
+        value: "20971520"
+      - key: RATE_LIMIT_MESSAGES
+        value: "50"
+      - key: RATE_LIMIT_WINDOW
+        value: "60"
+      - key: OPENAI_API_KEY
+        sync: false
 
-
-
-  # ==================================
-  # REDIS
-  # ==================================
   - type: redis
     name: hey-min-redis
     plan: free
 
-
-
-  # ==================================
-  # CRON JOB
-  # ==================================
-  - type: cron
-    name: hey-min-cron
-    runtime: python
-    plan: free
-
-    schedule: "0 0 * * *"
-
-    buildCommand: |
-      pip install -r requirements.txt
-
-    startCommand: python -m backend.cron_jobs
-
-    envVars:
-
-      - key: DATABASE_URL
-        fromDatabase:
-          name: hey-min-db
-          property: connectionString
-
-      - key: APP_ENV
-        value: production
-
-
-
-  # ==================================
-  # STATIC FILE SERVER
-  # ==================================
-  - type: web
-    name: hey-min-cdn
-    runtime: static
-    plan: free
-
-    buildCommand: |
-      echo "Static site ready"
-
-    staticPublishPath: ./static
-
-
-
-# ==================================
-# POSTGRES DATABASE
-# ==================================
 databases:
-
   - name: hey-min-db
-
     plan: free
-
     databaseName: heymin_db
-
     user: heymin_admin
-
-    postgresMajorVersion: 15
