@@ -25,8 +25,9 @@ from backend.ai_assistant import AIAssistant
 from backend.tasks import celery_app
 from backend.analytics import analytics
 from backend.payments import payment_manager
+from backend.health_check import router as health_router  # ✅ নতুন যোগ করো
 
-# Sentry for error monitoring
+# ==================== SENTRY ERROR MONITORING ====================
 if settings.SENTRY_DSN:
     sentry_sdk.init(
         dsn=settings.SENTRY_DSN,
@@ -34,21 +35,24 @@ if settings.SENTRY_DSN:
         traces_sample_rate=1.0
     )
 
-# Initialize rate limiter
-rate_limiter = AdvancedRateLimiter(None)  # Will set redis later
+# ==================== RATE LIMITER INIT ====================
+rate_limiter = AdvancedRateLimiter(None)
 
+# ==================== LIFESPAN MANAGER ====================
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Startup
-    print("🚀 Starting Chat Application...")
+    print("🚀 Starting Hey MIN Application...")
     
     # Connect to database
     await db.connect()
+    print("✅ Database connected")
     
     # Connect to Redis
     redis_client = await redis.from_url(settings.REDIS_URL, decode_responses=True)
     manager.redis_client = redis_client
     await manager.init_redis()
+    print("✅ Redis connected")
     
     # Initialize rate limiter with Redis
     rate_limiter.redis = redis_client
@@ -62,7 +66,7 @@ async def lifespan(app: FastAPI):
     asyncio.create_task(cleanup_expired_stories())
     asyncio.create_task(update_analytics())
     
-    print(f"✅ Application started on {settings.APP_ENV} mode")
+    print(f"✅ Hey MIN started on {settings.APP_ENV} mode")
     print(f"📊 Features: AI={settings.ENABLE_AI_ASSISTANT}, Calls={settings.ENABLE_VOICE_CALLS}")
     
     yield
@@ -70,15 +74,24 @@ async def lifespan(app: FastAPI):
     # Shutdown
     await db.close()
     await redis_client.close()
-    print("👋 Application shutdown")
+    print("👋 Hey MIN shutdown")
 
-app = FastAPI(title=settings.APP_NAME, version=settings.API_VERSION, lifespan=lifespan)
+# ==================== FASTAPI APP ====================
+app = FastAPI(
+    title="Hey MIN",
+    description="Enterprise Chat Application",
+    version="2.0.0",
+    lifespan=lifespan
+)
 
-# Rate limiting
+# ==================== HEALTH CHECK ROUTER ====================
+app.include_router(health_router)  # ✅ নতুন যোগ করো
+
+# ==================== RATE LIMITING ====================
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-# CORS
+# ==================== CORS MIDDLEWARE ====================
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.CORS_ORIGINS,
@@ -87,7 +100,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Static files
+# ==================== STATIC FILES ====================
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 FRONTEND_DIR = os.path.join(BASE_DIR, "frontend")
 UPLOAD_DIR = os.path.join(BASE_DIR, "uploads")
@@ -105,6 +118,7 @@ async def cleanup_expired_messages():
         await asyncio.sleep(3600)  # Every hour
         async with db.pool.acquire() as conn:
             await conn.execute("DELETE FROM messages WHERE expires_at < CURRENT_TIMESTAMP")
+            print("🧹 Cleaned expired messages")
 
 async def cleanup_expired_stories():
     """Clean up expired stories"""
@@ -112,12 +126,15 @@ async def cleanup_expired_stories():
         await asyncio.sleep(300)  # Every 5 minutes
         async with db.pool.acquire() as conn:
             await conn.execute("DELETE FROM stories WHERE expires_at < CURRENT_TIMESTAMP")
+            print("🧹 Cleaned expired stories")
 
 async def update_analytics():
     """Update analytics data"""
     while True:
         await asyncio.sleep(3600)
-        await analytics.update_daily_stats()
+        if analytics:
+            await analytics.update_daily_stats()
+            print("📊 Updated analytics")
 
 # ==================== AUTHENTICATION ENDPOINTS ====================
 
@@ -132,7 +149,6 @@ async def register(request: Request, username: str, email: str, password: str, f
     if len(password) < 6:
         raise HTTPException(400, "Password must be at least 6 characters")
     
-    # Check if email is valid
     if "@" not in email:
         raise HTTPException(400, "Invalid email")
     
@@ -168,7 +184,7 @@ async def login(request: Request, username: str, password: str, two_factor_code:
     
     # Check if account is locked
     if user.get("account_locked"):
-        raise HTTPException(403, "Account is locked. Contact support.")
+        raise HTTPException(403, "Account is locked. Contact support")
     
     # 2FA verification
     if user.get("is_2fa_enabled"):
@@ -262,8 +278,8 @@ async def get_user_profile(user_id: int, current_user_id: int):
         raise HTTPException(404, "User not found")
     
     # Remove sensitive info
-    del user["password_hash"]
-    del user.get("two_factor_secret", "")
+    user.pop("password_hash", None)
+    user.pop("two_factor_secret", None)
     
     # Check if blocked
     is_blocked = await db.is_blocked(current_user_id, user_id)
@@ -367,12 +383,6 @@ async def add_group_member(group_id: int, user_id: int, member_username: str):
     await db.add_group_member(group_id, member["id"])
     return {"ok": True}
 
-@app.delete("/api/groups/{group_id}/members/{member_id}")
-async def remove_group_member(group_id: int, member_id: int, user_id: int):
-    """Remove member from group"""
-    await db.remove_group_member(group_id, member_id)
-    return {"ok": True}
-
 # ==================== CALL ENDPOINTS ====================
 
 @app.post("/api/calls/initiate")
@@ -405,12 +415,6 @@ async def accept_call(call_id: str, user_id: int):
     
     return call
 
-@app.post("/api/calls/{call_id}/reject")
-async def reject_call(call_id: str, user_id: int):
-    """Reject incoming call"""
-    await voice_video_manager.reject_call(call_id, user_id)
-    return {"ok": True}
-
 @app.post("/api/calls/{call_id}/end")
 async def end_call(call_id: str, user_id: int):
     """End active call"""
@@ -438,12 +442,6 @@ async def get_stories(user_id: int):
     """Get active stories"""
     stories = await db.get_active_stories(user_id)
     return JSONResponse(stories)
-
-@app.post("/api/stories/{story_id}/view")
-async def view_story(story_id: int, user_id: int):
-    """Mark story as viewed"""
-    await db.view_story(story_id, user_id)
-    return {"ok": True}
 
 # ==================== BLOCK ENDPOINTS ====================
 
@@ -475,12 +473,6 @@ async def get_notifications(user_id: int, limit: int = 20):
     notifications = await db.get_notifications(user_id, limit)
     return JSONResponse(notifications)
 
-@app.post("/api/notifications/{notification_id}/read")
-async def mark_notification_read(notification_id: int, user_id: int):
-    """Mark notification as read"""
-    await db.mark_notification_read(notification_id, user_id)
-    return {"ok": True}
-
 # ==================== AI ASSISTANT ====================
 
 @app.post("/api/ai/chat")
@@ -489,13 +481,6 @@ async def ai_chat(user_id: int, message: str):
     ai = AIAssistant()
     response = await ai.get_response(user_id, message)
     return {"response": response}
-
-@app.post("/api/ai/analyze-sentiment")
-async def analyze_sentiment(message: str):
-    """Analyze sentiment of message"""
-    ai = AIAssistant()
-    sentiment = await ai.analyze_sentiment(message)
-    return {"sentiment": sentiment}
 
 # ==================== FILE UPLOAD ====================
 
@@ -571,12 +556,6 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
             if msg_type == "dm":
                 await message_handler.handle_text_message(user_id, username, data, websocket)
             
-            elif msg_type == "file":
-                await message_handler.handle_file_message(user_id, username, data, websocket)
-            
-            elif msg_type == "voice":
-                await message_handler.handle_voice_message(user_id, username, data, websocket)
-            
             elif msg_type == "typing":
                 await message_handler.handle_typing_indicator(user_id, data)
             
@@ -590,4 +569,75 @@ async def websocket_endpoint(websocket: WebSocket, token: str = Query(...)):
                 await message_handler.handle_delete_message(user_id, data)
             
             elif msg_type == "edit":
-                await message_handler.han
+                await message_handler.handle_edit_message(user_id, data)
+            
+            elif msg_type == "group_message":
+                await message_handler.handle_group_message(user_id, username, data)
+            
+            elif msg_type == "ping":
+                await websocket.send_json({"type": "pong", "timestamp": datetime.now().isoformat()})
+            
+            elif msg_type == "webrtc_offer" or msg_type == "webrtc_answer":
+                # WebRTC signaling
+                target_id = data.get("target_id")
+                await manager.send_to_user(target_id, data)
+    
+    except WebSocketDisconnect:
+        pass
+    except Exception as e:
+        print(f"WebSocket error: {e}")
+    finally:
+        # Cleanup
+        await manager.disconnect(user_id, websocket)
+        await db.update_online_status(user_id, False)
+        await manager.broadcast({
+            "type": "user_offline",
+            "user_id": user_id,
+            "username": username
+        })
+
+# ==================== SIMPLE HEALTH CHECK (Render-এর জন্য) ====================
+
+@app.get("/health")
+async def simple_health():
+    """Simple health check for Render"""
+    return {
+        "status": "ok",
+        "app": "Hey MIN",
+        "timestamp": datetime.now().isoformat()
+    }
+
+# ==================== FRONTEND ROUTES ====================
+
+@app.get("/")
+async def index():
+    return FileResponse(os.path.join(FRONTEND_DIR, "index.html"))
+
+@app.get("/chat")
+async def chat():
+    return FileResponse(os.path.join(FRONTEND_DIR, "chat.html"))
+
+@app.get("/groups")
+async def groups():
+    return FileResponse(os.path.join(FRONTEND_DIR, "groups.html"))
+
+@app.get("/profile")
+async def profile():
+    return FileResponse(os.path.join(FRONTEND_DIR, "profile.html"))
+
+@app.get("/calls")
+async def calls():
+    return FileResponse(os.path.join(FRONTEND_DIR, "calls.html"))
+
+# ==================== RUN SERVER ====================
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "backend.main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=settings.DEBUG
+    )
+```
+
+---
