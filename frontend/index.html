@@ -189,8 +189,36 @@
 
         <div id="message" class="message"></div>
     </div>
+    <!-- Theme toggle button - add anywhere in your HTML -->
+<button class="theme-toggle" onclick="toggleTheme()">
+    🌙
+</button>
 
-    <script>
+<script>
+function toggleTheme() {
+    const body = document.body;
+    const themeBtn = document.querySelector('.theme-toggle');
+    
+    if (body.classList.contains('dark-theme')) {
+        body.classList.remove('dark-theme');
+        localStorage.setItem('theme', 'light');
+        themeBtn.textContent = '🌙';
+    } else {
+        body.classList.add('dark-theme');
+        localStorage.setItem('theme', 'dark');
+        themeBtn.textContent = '☀️';
+    }
+}
+
+// Load saved theme on page load
+const savedTheme = localStorage.getItem('theme');
+if (savedTheme === 'dark') {
+    document.body.classList.add('dark-theme');
+    document.querySelector('.theme-toggle').textContent = '☀️';
+}
+
+
+
         const API_URL = window.location.origin;
 
         function showTab(tab) {
