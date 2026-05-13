@@ -1,20 +1,22 @@
 services:
-  # =========================
-  # MAIN WEB SERVER
-  # =========================
+
+  # ==================================
+  # MAIN FASTAPI SERVER
+  # ==================================
   - type: web
     name: hey-min-web
     runtime: python
     repo: https://github.com/YOUR_USERNAME/hey-min
-    plan: professional
+    branch: main
+    plan: free
 
     buildCommand: |
       pip install -r requirements.txt
-      python -m playwright install chromium
 
-    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT --workers 4
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port $PORT
 
     envVars:
+
       - key: DATABASE_URL
         fromDatabase:
           name: hey-min-db
@@ -45,7 +47,7 @@ services:
         value: "false"
 
       - key: CORS_ORIGINS
-        value: "https://hey-min.onrender.com,https://www.heymin.com"
+        value: "*"
 
       - key: MAX_FILE_SIZE
         value: "10485760"
@@ -57,16 +59,16 @@ services:
         value: "60"
 
       - key: ENABLE_2FA
-        value: "true"
+        value: "false"
 
       - key: ENABLE_VOICE_CALLS
-        value: "true"
+        value: "false"
 
       - key: ENABLE_VIDEO_CALLS
-        value: "true"
+        value: "false"
 
       - key: ENABLE_AI_ASSISTANT
-        value: "true"
+        value: "false"
 
       - key: ENABLE_FILE_SHARING
         value: "true"
@@ -75,49 +77,28 @@ services:
         value: "true"
 
       - key: ENABLE_STORIES
-        value: "true"
+        value: "false"
 
       - key: ENABLE_POLLS
         value: "true"
 
-      - key: OPENAI_API_KEY
-        sync: false
-
-      - key: SENDGRID_API_KEY
-        sync: false
-
-      - key: STRIPE_API_KEY
-        sync: false
-
-      - key: AWS_ACCESS_KEY
-        sync: false
-
-      - key: AWS_SECRET_KEY
-        sync: false
-
-      - key: AWS_BUCKET_NAME
-        value: "hey-min-uploads"
-
-      - key: SENTRY_DSN
-        sync: false
-
-      - key: FIREBASE_CREDENTIALS
-        sync: false
 
 
-  # =========================
+  # ==================================
   # CELERY WORKER
-  # =========================
+  # ==================================
   - type: worker
     name: hey-min-worker
     runtime: python
-    plan: professional
+    plan: free
 
-    buildCommand: pip install -r requirements.txt
+    buildCommand: |
+      pip install -r requirements.txt
 
-    startCommand: celery -A backend.tasks worker --loglevel=info --concurrency=4
+    startCommand: celery -A backend.tasks worker --loglevel=info
 
     envVars:
+
       - key: DATABASE_URL
         fromDatabase:
           name: hey-min-db
@@ -133,31 +114,33 @@ services:
         value: production
 
 
-  # =========================
+
+  # ==================================
   # REDIS
-  # =========================
+  # ==================================
   - type: redis
     name: hey-min-redis
-    plan: professional
-    maxmemoryPolicy: allkeys-lru
-    ipAllowList: []
+    plan: free
 
 
-  # =========================
+
+  # ==================================
   # CRON JOB
-  # =========================
+  # ==================================
   - type: cron
     name: hey-min-cron
+    runtime: python
+    plan: free
 
     schedule: "0 0 * * *"
 
-    runtime: python
-
-    buildCommand: pip install -r requirements.txt
+    buildCommand: |
+      pip install -r requirements.txt
 
     startCommand: python -m backend.cron_jobs
 
     envVars:
+
       - key: DATABASE_URL
         fromDatabase:
           name: hey-min-db
@@ -167,36 +150,33 @@ services:
         value: production
 
 
-  # =========================
-  # STATIC CDN
-  # =========================
-  - type: static_site
+
+  # ==================================
+  # STATIC FILE SERVER
+  # ==================================
+  - type: web
     name: hey-min-cdn
+    runtime: static
+    plan: free
 
-    buildCommand: echo "Static site ready"
+    buildCommand: |
+      echo "Static site ready"
 
-    publishPath: ./static
-
-    headers:
-      - path: /*
-        name: Cache-Control
-        value: max-age=31536000
+    staticPublishPath: ./static
 
 
-# =========================
-# DATABASES
-# =========================
+
+# ==================================
+# POSTGRES DATABASE
+# ==================================
 databases:
+
   - name: hey-min-db
 
-    plan: professional
+    plan: free
 
     databaseName: heymin_db
 
     user: heymin_admin
 
     postgresMajorVersion: 15
-
-    ipAllowList: []
-
-    diskSizeGB: 10
