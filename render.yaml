@@ -24,6 +24,8 @@ services:
         value: "Hey MIN"
       - key: APP_ENV
         value: production
+      - key: DEBUG
+        value: "false"
       - key: ENABLE_2FA
         value: "true"
       - key: ENABLE_VOICE_CALLS
@@ -50,23 +52,43 @@ services:
         value: "true"
       - key: ENABLE_DARK_MODE
         value: "true"
+      - key: ENABLE_FORWARD_MESSAGE
+        value: "true"
+      - key: ENABLE_SELF_DESTRUCT
+        value: "true"
+      - key: ENABLE_MESSAGE_SEARCH
+        value: "true"
+      - key: ENABLE_VOICE_MESSAGES
+        value: "true"
+      - key: ENABLE_POLLS
+        value: "true"
       - key: MAX_FILE_SIZE
         value: "20971520"
       - key: RATE_LIMIT_MESSAGES
         value: "50"
+      - key: RATE_LIMIT_LOGIN
+        value: "10"
       - key: RATE_LIMIT_WINDOW
         value: "60"
+      - key: MAX_GROUP_SIZE
+        value: "500"
       - key: OPENAI_API_KEY
+        sync: false
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: STRIPE_API_KEY
+        sync: false
+      - key: AWS_ACCESS_KEY
+        sync: false
+      - key: AWS_SECRET_KEY
         sync: false
 
   - type: redis
     name: hey-min-redis
     plan: free
-    ipAllowList: []  # ← এই লাইনটা যোগ করো! সব IP থেকে access দেবে
 
 databases:
   - name: hey-min-db
     plan: free
     databaseName: heymin_db
     user: heymin_admin
-    ipAllowList: []  # ← ডাটাবেসের জন্যও যোগ করো
