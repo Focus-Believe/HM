@@ -62,9 +62,11 @@ services:
   - type: redis
     name: hey-min-redis
     plan: free
+    ipAllowList: []  # ← এই লাইনটা যোগ করো! সব IP থেকে access দেবে
 
 databases:
   - name: hey-min-db
     plan: free
     databaseName: heymin_db
     user: heymin_admin
+    ipAllowList: []  # ← ডাটাবেসের জন্যও যোগ করো
