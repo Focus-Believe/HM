@@ -1,28 +1,133 @@
 services:
+  # মেইন ওয়েব সার্ভিস
   - type: web
-    name: chatapp
+    name: hey-min-web
     runtime: python
-    buildCommand: pip install -r requirements.txt
-    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port 8000
+    repo: https://github.com/YOUR_USERNAME/hey-min  # তোর GitHub রেপো লিংক দিবি
+    plan: professional  # প্রোডাকশনের জন্য
+    buildCommand: |
+      pip install -r requirements.txt
+      python -m playwright install chromium  # যদি web scraping থাকে
+    startCommand: uvicorn backend.main:app --host 0.0.0.0 --port 8000 --workers 4
     envVars:
       - key: DATABASE_URL
         fromDatabase:
-          name: chatapp-db
+          name: hey-min-db
           property: connectionString
       - key: REDIS_URL
         fromService:
           type: redis
-          name: chatapp-redis
+          name: hey-min-redis
           property: connectionString
       - key: SECRET_KEY
         generateValue: true
+      - key: JWT_SECRET
+        generateValue: true
+      - key: WEBHOOK_SECRET
+        generateValue: true
+      - key: APP_ENV
+        value: production
+      - key: APP_NAME
+        value: "Hey MIN"
+      - key: DEBUG
+        value: false
+      - key: CORS_ORIGINS
+        value: "https://hey-min.onrender.com,https://www.heymin.com"
+      - key: MAX_FILE_SIZE
+        value: "10485760"
+      - key: RATE_LIMIT_MESSAGES
+        value: "30"
+      - key: RATE_LIMIT_WINDOW
+        value: "60"
+      - key: ENABLE_2FA
+        value: "true"
+      - key: ENABLE_VOICE_CALLS
+        value: "true"
+      - key: ENABLE_VIDEO_CALLS
+        value: "true"
+      - key: ENABLE_AI_ASSISTANT
+        value: "true"
+      - key: ENABLE_FILE_SHARING
+        value: "true"
+      - key: ENABLE_GROUP_CHAT
+        value: "true"
+      - key: ENABLE_STORIES
+        value: "true"
+      - key: ENABLE_POLLS
+        value: "true"
+      - key: OPENAI_API_KEY
+        sync: false  # মানে আলাদা করে সেট করতে হবে
+      - key: SENDGRID_API_KEY
+        sync: false
+      - key: STRIPE_API_KEY
+        sync: false
+      - key: AWS_ACCESS_KEY
+        sync: false
+      - key: AWS_SECRET_KEY
+        sync: false
+      - key: AWS_BUCKET_NAME
+        value: "hey-min-uploads"
+      - key: SENTRY_DSN
+        sync: false
+      - key: FIREBASE_CREDENTIALS
+        sync: false
+
+  # ব্যাকগ্রাউন্ড ওয়ার্কার (Celery)
+  - type: worker
+    name: hey-min-worker
+    runtime: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: celery -A backend.tasks worker --loglevel=info --concurrency=4
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hey-min-db
+          property: connectionString
+      - key: REDIS_URL
+        fromService:
+          type: redis
+          name: hey-min-redis
+          property: connectionString
       - key: APP_ENV
         value: production
 
+  # রিয়েল-টাইম নোটিফিকেশনের জন্য রেডিস পাব/সাব
   - type: redis
-    name: chatapp-redis
-    plan: free
+    name: hey-min-redis
+    plan: professional  # প্রোডাকশনের জন্য
+    maxmemoryPolicy: allkeys-lru
+    ipAllowList: []  # সব আইপি থেকে অ্যাক্সেস
 
+  # ক্রন জব (দৈনিক ব্যাকআপ ও ক্লিনআপ)
+  - type: cron
+    name: hey-min-cron
+    schedule: "0 0 * * *"  # প্রতিদিন মধ্যরাতে
+    buildCommand: pip install -r requirements.txt
+    startCommand: python -m backend.cron_jobs
+    envVars:
+      - key: DATABASE_URL
+        fromDatabase:
+          name: hey-min-db
+          property: connectionString
+      - key: APP_ENV
+        value: production
+
+# ডাটাবেস
 databases:
-  - name: chatapp-db
-    plan: free
+  - name: hey-min-db
+    plan: professional  # প্রোডাকশন: professional, ডেভ: starter
+    databaseName: heymin_db
+    user: heymin_admin
+    postgresMajorVersion: 15
+    ipAllowList: []
+    diskSizeGB: 10  # 10GB স্টোরেজ
+
+# Static assets CDN (ঐচ্ছিক)
+  - name: hey-min-cdn
+    type: static-site
+    buildCommand: echo "Static site ready"
+    publishPath: ./static
+    headers:
+      - path: /*
+        name: Cache-Control
+        value: max-age=31536000
