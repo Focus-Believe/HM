@@ -9,11 +9,6 @@ services:
         fromDatabase:
           name: hey-min-db
           property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: hey-min-redis
-          property: connectionString
       - key: SECRET_KEY
         generateValue: true
       - key: JWT_SECRET
@@ -62,6 +57,10 @@ services:
         value: "true"
       - key: ENABLE_POLLS
         value: "true"
+      - key: ENABLE_SCREEN_SHARE
+        value: "true"
+      - key: ENABLE_CHAT_EXPORT
+        value: "true"
       - key: MAX_FILE_SIZE
         value: "20971520"
       - key: RATE_LIMIT_MESSAGES
@@ -74,18 +73,6 @@ services:
         value: "500"
       - key: OPENAI_API_KEY
         sync: false
-      - key: SENDGRID_API_KEY
-        sync: false
-      - key: STRIPE_API_KEY
-        sync: false
-      - key: AWS_ACCESS_KEY
-        sync: false
-      - key: AWS_SECRET_KEY
-        sync: false
-
-  - type: redis
-    name: hey-min-redis
-    plan: free
 
 databases:
   - name: hey-min-db
